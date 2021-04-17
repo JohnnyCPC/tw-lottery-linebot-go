@@ -1,1 +1,1 @@
-web: twlotterylinebotgo
+web: tw-lottery-linebot-go
