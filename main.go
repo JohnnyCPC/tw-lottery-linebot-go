@@ -48,8 +48,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				var wf bool
 				var sec []int
 				switch message.Text {
-				case "539":
-				case "今彩539":
+				case "539", "今彩539":
 					t = 39
 					c = 5
 				case "威力彩":
