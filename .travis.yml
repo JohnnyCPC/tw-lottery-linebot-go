@@ -6,6 +6,7 @@ go:
 - master
 deploy:
   provider: heroku
+  app: twlotterylinebotgo
   api_key:
     secure: Szv1gZXhCGqLyn88iuLXuZLk9u6ZKojwZQ+lc/lNxe+Uf+xCN9KsFP12h/N4+MTMyKmLR1XoV6h3R72vw/qdEqH4cevnh1FGM5q9jmgJ7FD/PjaKhfZppzg+KT4LlAihvWKc5E/YrfNQXcKyqhp64YGFYpMjJ0mqfwkt/Yl1H4w0MEjLb0BtMz+jZ7ABAYZlpXnihqj+mxtzrbwbnVehKUtehYXFjXtxlNB7KOpPqS6XLnaodzsx3R/YR3DC8nbXMD4FD/BJclQ92gp6hon5K/BDE/S+v/KbO5QOlzp6eVdLugrwRv74aWYZGwNQhUCpLPrIBj+4EQMMoEmyQO4gzltKHM0sJ50j5CdYOHtzMKsrNraznA7jBN0u94Q0wpHNPQZ/QrtjKvIgAo7j+cLMPRALaWIdVfE350KVw1FiDC8Cu90F+7GUlZJx7Ah9lvXqVBCyZUlj+wZVHoZK5IG20alM7+QZM4v5/DLK/6bESZPeXzVuin38CetxlBsgwiukJQDtEouy75/fH7jkiit2ilQFQ1/61K64sO49m28CX2ys2QmLU0QtOYPCl5i6X52ad8IadQuCk9i81MZLSqAz31sEfjMDeAfxn8OJh1IuSa4WUBdpUFvaIWsSB0d5YBAWheeRsBXx8R79Z0AsWhoIcno/yuX0mkRUX41UcukbBI0=
   on: main
