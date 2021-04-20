@@ -1,9 +1,6 @@
 language: go
 go:
-- 1.14.x
-- 1.15.x
 - 1.16
-- master
 deploy:
   provider: heroku
   app: twlotterylinebotgo
