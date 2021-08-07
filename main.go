@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/JohnnyCPC/reservoir-sampling-go/sks"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
@@ -43,11 +45,25 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
-				var t, c int
+				var t, c, n int
 				var mes, mes2 string
 				var wf bool
-				var sec []int
-				switch message.Text {
+				var sec, luck []int
+
+				res := strings.Split(message.Text, ",")
+				if len(res) < 2 {
+					n = 1
+				} else {
+					if n, err = strconv.Atoi(res[1]); err != nil {
+						n = 1
+					} else {
+						if n > 5 {
+							n = 5
+						}
+					}
+				}
+
+				switch res[0] {
 				case "539", "今彩539":
 					t = 39
 					c = 5
@@ -73,12 +89,14 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					a[i] = i + 1
 				}
 
-				luck := sks.SelectKItems(a, len(a), c)
-				sort.Ints(luck)
-				mes = fmt.Sprint(luck)
+				for j := 0; j < n; j++ {
+					luck = sks.SelectKItems(a, len(a), c)
+					sort.Ints(luck)
+					mes += fmt.Sprint(luck) + ","
+				}
 
 				if wf {
-					mes2 = "Second :" + fmt.Sprint(sec[luck[0]%8])
+					mes2 = "Second Section:" + fmt.Sprint(sec[luck[0]%8])
 				}
 
 				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Lucky Number : "+mes+" "+mes2)).Do(); err != nil {
