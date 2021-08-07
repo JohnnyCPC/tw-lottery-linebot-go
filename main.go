@@ -96,7 +96,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				}
 
 				if wf {
-					mes2 = "Second Section:" + fmt.Sprint(sec[luck[0]%8])
+					mes2 = "Second Section:" + fmt.Sprint(sks.SelectKItems(sec, 8, n))
 				}
 
 				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Lucky Number : "+mes+" "+mes2)).Do(); err != nil {
