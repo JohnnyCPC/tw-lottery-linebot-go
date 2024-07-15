@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -10,13 +12,38 @@ import (
 	"strings"
 
 	"github.com/JohnnyCPC/reservoir-sampling-go/sks"
+	"github.com/JohnnyCPC/tw-lottery-linebot-go/analyze"
 	"github.com/line/line-bot-sdk-go/v8/linebot"
 	"github.com/line/line-bot-sdk-go/v8/linebot/webhook"
 )
 
+type LotteryCombinations struct {
+	RepresentHex string `json:"representhex"`
+	RepresentBin string `json:"representbin"`
+	NGram        int    `json:"ngram"`
+	Times        int    `json:"times"`
+	Numbers      []int  `json:"numbers"`
+}
+
 var bot *linebot.Client
+var result map[string]LotteryCombinations
 
 func main() {
+
+	// Open our jsonFile
+	jsonFile, err1 := os.Open("./data/539_2007_2024_result.json")
+	// if we os.Open returns an error then handle it
+	if err1 != nil {
+		fmt.Println(err1)
+	}
+	fmt.Println("Successfully Opened json")
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	json.Unmarshal([]byte(byteValue), &result)
+
 	var err error
 	bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
 	log.Println("Bot:", bot, " err:", err)
@@ -50,7 +77,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			case webhook.TextMessageContent:
 				var t, c, n int
 				var mes, mes2 string
-				var wf bool
+				var wf, ana bool
 				var sec, luck []int
 
 				res := strings.Split(message.Text, ",")
@@ -70,6 +97,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				case "539", "今彩539":
 					t = 39
 					c = 5
+					ana = true
 				case "威力彩":
 					t = 38
 					c = 6
@@ -102,7 +130,22 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					mes2 = "Second Section:" + fmt.Sprint(sks.SelectKItems(sec, 8, n))
 				}
 
-				if _, err = bot.ReplyMessage(e.ReplyToken, linebot.NewTextMessage("Lucky Number : "+mes+" "+mes2)).Do(); err != nil {
+				if ana {
+					inputdata := analyze.BuildInputData(luck)
+
+					for _, in := range inputdata {
+						//fmt.Println(in)
+						if val, ok := result[in]; ok {
+							if val.NGram >= 3 {
+								mes2 += "Numeber set:" + fmt.Sprint(val.Numbers) + "Times: " + fmt.Sprint(val.Times) + "\n"
+							}
+							//fmt.Println(val)
+						}
+					}
+
+				}
+
+				if _, err = bot.ReplyMessage(e.ReplyToken, linebot.NewTextMessage("Lucky Number : "+mes+"\n"+mes2)).Do(); err != nil {
 					log.Print(err)
 				}
 
