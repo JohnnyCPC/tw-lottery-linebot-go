@@ -149,7 +149,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 							}
 							target = append(target, t)
 						}
-
+						mes = fmt.Sprint(target)
 					} else {
 						target = luck
 					}
