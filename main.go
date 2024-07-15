@@ -10,7 +10,8 @@ import (
 	"strings"
 
 	"github.com/JohnnyCPC/reservoir-sampling-go/sks"
-	"github.com/line/line-bot-sdk-go/v7/linebot"
+	"github.com/line/line-bot-sdk-go/v8/linebot"
+	"github.com/line/line-bot-sdk-go/v8/linebot/webhook"
 )
 
 var bot *linebot.Client
@@ -30,7 +31,7 @@ func main() {
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
 
-	events, err := bot.ParseRequest(r)
+	cb, err := webhook.ParseRequest(os.Getenv("ChannelSecret"), r)
 
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
@@ -41,10 +42,12 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, event := range events {
-		if event.Type == linebot.EventTypeMessage {
-			switch message := event.Message.(type) {
-			case *linebot.TextMessage:
+	for _, event := range cb.Events {
+		log.Printf("Got event %v", event)
+		switch e := event.(type) {
+		case webhook.MessageEvent:
+			switch message := e.Message.(type) {
+			case webhook.TextMessageContent:
 				var t, c, n int
 				var mes, mes2 string
 				var wf bool
@@ -79,7 +82,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					t = 24
 					c = 12
 				default:
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Please Enter Again!")).Do(); err != nil {
+					if _, err = bot.ReplyMessage(e.ReplyToken, linebot.NewTextMessage("Please Enter Again!")).Do(); err != nil {
 						log.Print(err)
 					}
 					return
@@ -99,9 +102,10 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					mes2 = "Second Section:" + fmt.Sprint(sks.SelectKItems(sec, 8, n))
 				}
 
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Lucky Number : "+mes+" "+mes2)).Do(); err != nil {
+				if _, err = bot.ReplyMessage(e.ReplyToken, linebot.NewTextMessage("Lucky Number : "+mes+" "+mes2)).Do(); err != nil {
 					log.Print(err)
 				}
+
 			}
 		}
 	}
